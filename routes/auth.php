@@ -57,3 +57,16 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
                 ->name('logout');
 });
+
+//補足//
+//Route::get('register', [RegisteredUserController::class, 'create'])->name('register');//
+//URL： /register 使うコントローラー： RegisteredUserController 呼び出す関数： create() → 新規登録フォームを表示
+
+//Laravel Breezeでは、URL → 処理 のルールが最初から自動で決まっている//
+/*会員登録フォーム表示 /register （GET） RegisteredUserController@create
+会員登録実行          /register （POST）RegisteredUserController@store
+ログインフォーム表示   /login（GET）AuthenticatedSessionController@create
+ログイン実行          /login（POST）AuthenticatedSessionController@store
+ログアウト            /logout（POST）AuthenticatedSessionController@destroy
+パスワード忘れた       /forgot-password（GET）PasswordResetLinkController@create
+パスワード再設定.      /reset-password/{token} NewPasswordController@create*/

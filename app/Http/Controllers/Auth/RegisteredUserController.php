@@ -46,6 +46,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(RouteServiceProvider::HOME);
+        return redirect(RouteServiceProvider::HOME); //return redirect('/dashboard'); に書き換え可能。RouteServiceProvider.phpの20行目public const HOME = '/dashboard';にHOME = '/dashboard'との記入があるため。//
     }
 }
