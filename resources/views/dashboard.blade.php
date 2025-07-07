@@ -12,7 +12,6 @@
                 @include('microposts.form')
                 {{-- 投稿一覧 --}}
                 @include('microposts.microposts')
-            </div>
         </div>
     @else
         <div class="prose hero bg-base-200 mx-auto max-w-full rounded">
@@ -26,3 +25,10 @@
         </div>
     @endif
 @endsection
+
+{{-- @include('microposts.microposts') --}}
+
+{{-- Blade テンプレートの記法で --}}
+{{-- ・最初の microposts はフォルダ名（resources/views/microposts） --}}
+{{-- ・2つ目の microposts はファイル名（microposts.blade.php） --}}
+{{-- ・.blade.php の拡張子は省略して書くのがルール --}}

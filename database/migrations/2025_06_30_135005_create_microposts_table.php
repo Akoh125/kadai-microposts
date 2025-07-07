@@ -18,7 +18,9 @@ return new class extends Migration
             $table->timestamps();
 
             // 外部キー制約
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users');//$table->foreign('user_id')このテーブルにあるuser_idは他のテーブルのデータと繋がっていると宣言。->references('id')どのカラムと繋がっている？→ユーザーのIDと繋がっている。->on('users')どのテーブルのid？→usersテーブルのidと繋がっている
+
+
         });
     }
 
