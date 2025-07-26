@@ -23,7 +23,7 @@ class User extends Authenticatable
      */
     public function loadRelationshipCounts()
     {
-        $this->loadCount(['microposts', 'followings', 'followers']);
+        $this->loadCount(['microposts', 'followings', 'followers','favorites']);
     }
     
     /**
@@ -49,15 +49,15 @@ class User extends Authenticatable
      * @return bool
      */
 
-    public function follow(int $userId)
+    public function follow(int $userId) //$userIdにid3番が代入される(UserFollowControllerの18行目のfollowで引き渡されたid番号のこと)
     {
-        $exist = $this->is_following($userId);
-        $its_me = $this->id == $userId;
+        $exist = $this->is_following($userId); //is_followingの関数にも$userIdに3番が入っているため、is_followingを実行しながら3番を渡している。57行目のif文により、呼び出した$existには$this->is_following($userId)のtrueもしくはfalseの値が入っている。
+        $its_me = $this->id == $userId; //$this->id今呼出しているuserのidなのでログイン中のidということ。userモデルではthisはuserのインスタンスのこと。ログイン中のidと受け取ったuseridが同じ(3番)かどうか。同じなら$this->id == $userId;がtrue、異なるならfalse。
         
-        if ($exist || $its_me) {
-            return false;
+        if ($exist || $its_me) { //あった場合92行目の$thisから>exists();までがtrueになり、ない場合false。→次に54行目へ戻る。$existがtrueであるか(||=orの意)$its_meがtrueであるか。
+            return false; //何もしない
         } else {
-            $this->followings()->attach($userId);
+            $this->followings()->attach($userId); //$this=ログイン中のuser。followings関数を実行し呼び出しつつattachでデータベースで登録。$this(ログイン中のuser)と$userId(3番)が同じならreturn trueへ。
             return true;
         }
     }
@@ -89,7 +89,7 @@ class User extends Authenticatable
      */
     public function is_following(int $userId)
     {
-        return $this->followings()->where('follow_id', $userId)->exists();
+        return $this->followings()->where('follow_id', $userId)->exists(); //followings関数を実行しながらfollow_idの列に3番に値するものがあるかどうか探している関数がwhere。existsで有無を判定。→次に57行目の$existsへ。
     }
 
     /**
@@ -103,5 +103,41 @@ class User extends Authenticatable
         $userIds[] = $this->id;
         // それらのユーザーが所有する投稿に絞り込む
         return Micropost::whereIn('user_id', $userIds);
+    }
+
+    public function favorites()
+    {
+        return $this->belongsToMany(Micropost::class, 'favorites', 'user_id', 'micropost_id')->withTimestamps();
+    }
+
+    public function favorite(int $micropostId) //$micropostIdになるのはお気に入り機能の対象が投稿だから。
+    {
+        $exist = $this->is_favorite($micropostId);
+        //$its_me = $this->id == $userId; $its_me自分自身か？のチェックは不要。投稿idが対象なのでuseridとの比較が不要。
+        
+        if ($exist) {
+            return false;
+        } else {
+            $this->favorites()->attach($micropostId);
+            return true;
+        }
+    }
+    
+    public function unfavorite(int $micropostId)
+    {
+        $exist = $this->is_favorite($micropostId);
+        //$its_me = $this->id == $userId;　116行目と同様の理由
+        
+        if ($exist) {
+            $this->favorites()->detach($micropostId);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function is_favorite($micropostId)
+    {
+    return $this->favorites()->where('micropost_id', $micropostId)->exists();
     }
 }
